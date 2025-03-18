@@ -1,0 +1,73 @@
+#include <stdio.h>
+
+int main() {
+    int n, i, sys_n, user_n;
+    float awt = 0, atat = 0;
+
+
+    printf("Enter number of system processes: ");
+    scanf("%d", &sys_n);  
+    
+    int system_bt[sys_n], system_wt[sys_n], system_tat[sys_n];
+    
+    for (i = 0; i < sys_n; i++) {
+        printf("Enter Burst Time for System Process %d: ", i + 1);
+        scanf("%d", &system_bt[i]);
+    }
+
+    system_wt[0] = 0;
+    system_tat[0] = system_bt[0];
+    for (i = 1; i < sys_n; i++) {
+        system_wt[i] = system_wt[i - 1] + system_bt[i - 1];
+        system_tat[i] = system_wt[i] + system_bt[i];
+        awt += system_wt[i];
+        atat += system_tat[i];
+    }
+
+    awt /= sys_n;
+    atat /= sys_n;
+
+    printf("\nSystem Processes Scheduling:\n");
+    printf("\nProcess\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (i = 0; i < sys_n; i++) {
+        printf("P%d\t%d\t\t%d\t\t%d\n", i + 1, system_bt[i], system_wt[i], system_tat[i]);
+    }
+    printf("\nAverage Waiting Time = %.2f", awt);
+    printf("\nAverage Turnaround Time = %.2f\n", atat);
+
+    awt = 0;
+    atat = 0;
+
+
+    printf("\nEnter number of user processes: ");
+    scanf("%d", &user_n);  
+    
+    int user_bt[user_n], user_wt[user_n], user_tat[user_n];
+
+    for (i = 0; i < user_n; i++) {
+        printf("Enter Burst Time for User Process %d: ", i + 1);
+        scanf("%d", &user_bt[i]);
+    }
+
+    user_wt[0] = 0;
+    user_tat[0] = user_bt[0];
+    for (i = 1; i < user_n; i++) {
+        user_wt[i] = user_wt[i - 1] + user_bt[i - 1];
+        user_tat[i] = user_wt[i] + user_bt[i];
+        awt += user_wt[i];
+        atat += user_tat[i];
+    }
+
+    awt /= user_n;
+    atat /= user_n;
+
+    printf("\nUser Processes Scheduling:\n");
+    printf("\nProcess\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (i = 0; i < user_n; i++) {
+        printf("P%d\t%d\t\t%d\t\t%d\n", i + 1, user_bt[i], user_wt[i], user_tat[i]);
+    }
+    printf("\nAverage Waiting Time = %.2f", awt);
+    printf("\nAverage Turnaround Time = %.2f\n", atat);
+
+    return 0;
+}
