@@ -1,0 +1,48 @@
+#include <stdlib.h>
+
+typedef struct {
+    int id;
+    int period;
+    int execution;
+    int remaining;
+} Task;
+
+int comparePeriod(const void *a, const void *b) {
+    return ((Task *)a)->period - ((Task *)b)->period;
+}
+
+void RMS_Scheduling(Task tasks[], int numTasks) {
+    qsort(tasks, numTasks, sizeof(Task), comparePeriod);
+
+    for (int t = 0; t < 100; t++) {
+        Task *currentTask = NULL;
+        for (int i = 0; i < numTasks; i++) {
+            if (tasks[i].remaining > 0) {
+                currentTask = &tasks[i];
+                currentTask->remaining--;
+                printf("Time %d: Task %d is running\n", t, currentTask->id);
+                break;
+            }
+        }
+
+        if (currentTask == NULL) {
+            break;
+        }
+    }
+
+    printf("Rate Monotonic Scheduling completed.\n");
+}
+
+int main() {
+    Task tasks[] = {
+        {1, 4, 2, 2},
+        {2, 6, 3, 3},
+        {3, 8, 4, 4}
+    };
+
+    int numTasks = sizeof(tasks) / sizeof(tasks[0]);
+
+    RMS_Scheduling(tasks, numTasks);
+
+    return 0;
+}
