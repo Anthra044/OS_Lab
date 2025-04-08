@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+
+#define MAX 5
+
+int hungry[MAX] = {0};
+int order[MAX];
+int hungry_count = 0;
+int mode = 1;
+
+int mutex = 1;
+int chopsticks[MAX] = {1, 1, 1, 1, 1};
+
+
+void wait(int* semaphore) {
+    while (*semaphore <= 0); 
+    (*semaphore)--;
+}
+
+void signal(int* semaphore) {
+    (*semaphore)++;
+}
+
+void* philosopher(void* num) {
+    int id = *(int*)num;
+
+    if (mode == 1) {
+        for (int i = 0; i < hungry_count; i++) {
+            if (order[i] == id) {
+                wait(&mutex);
+
+                for (int j = 0; j < hungry_count; j++) {
+                    printf("P %d is waiting\n", order[j] + 1);
+                }
+
+                wait(&chopsticks[id]);
+                wait(&chopsticks[(id + 1) % MAX]);
+
+                printf("P %d is granted to eat\n", id + 1);
+                sleep(1); // simulate eating
+                printf("P %d has finished eating\n", id + 1);
+
+                signal(&chopsticks[id]);
+                signal(&chopsticks[(id + 1) % MAX]);
+                signal(&mutex);
+            }
+        }
+    } else if (mode == 2) {
+        wait(&mutex);
+
+        if (hungry[id]) {
+            wait(&chopsticks[id]);
+            wait(&chopsticks[(id + 1) % MAX]);
+
+            printf("P %d is granted to eat\n", id + 1);
+            sleep(1); // simulate eating
+            signal(&chopsticks[id]);
+            signal(&chopsticks[(id + 1) % MAX]);
+
+            printf("P %d has finished eating\n", id + 1);
+        }
+
+        signal(&mutex);
+    }
+
+    return NULL;
+}
+
+int main() {
+    int total, i;
+
+    printf("Enter the total number of philosophers: ");
+    scanf("%d", &total);
+
+    printf("How many are hungry: ");
+    scanf("%d", &hungry_count);
+
+    for (i = 0; i < hungry_count; i++) {
+        int pos;
+        printf("Enter philosopher %d position (1 to 5): ", i + 1);
+        scanf("%d", &pos);
+        order[i] = pos - 1;
+        hungry[pos - 1] = 1;
+    }
+
+    while (1) {
+        printf("\n1. One can eat at a time\n2. Two can eat at a time\n3. Exit\nEnter your choice: ");
+        scanf("%d", &mode);
+        if (mode == 3) break;
+
+        pthread_t threads[MAX];
+        int ids[MAX];
+
+        for (i = 0; i < MAX; i++) {
+            ids[i] = i;
+            pthread_create(&threads[i], NULL, philosopher, &ids[i]);
+        }
+
+        for (i = 0; i < MAX; i++) {
+            pthread_join(threads[i], NULL);
+        }
+    }
+
+    return 0;
+}
