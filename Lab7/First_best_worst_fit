@@ -1,0 +1,121 @@
+#include <stdio.h>
+#define MAX 100
+
+void firstFit(int bs[], int m, int ps[], int n) {
+    int alloc[MAX];
+    for (int i = 0; i < n; i++)
+        alloc[i] = -1;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (bs[j] >= ps[i]) {
+                alloc[i] = j;
+                bs[j] -= ps[i];
+                break;
+            }
+        }
+    }
+
+    printf("\nFirst-Fit:\n");
+    printf("P.No\tP.Size\tBlock\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t", i + 1, ps[i]);
+        if (alloc[i] != -1)
+            printf("%d\n", alloc[i] + 1);
+        else
+            printf("NA\n");
+    }
+}
+
+void bestFit(int bs[], int m, int ps[], int n) {
+    int alloc[MAX];
+    for (int i = 0; i < n; i++)
+        alloc[i] = -1;
+
+    for (int i = 0; i < n; i++) {
+        int best = -1;
+        for (int j = 0; j < m; j++) {
+            if (bs[j] >= ps[i]) {
+                if (best == -1 || bs[j] < bs[best])
+                    best = j;
+            }
+        }
+        if (best != -1) {
+            alloc[i] = best;
+            bs[best] -= ps[i];
+        }
+    }
+
+    printf("\nBest-Fit:\n");
+    printf("P.No\tP.Size\tBlock\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t", i + 1, ps[i]);
+        if (alloc[i] != -1)
+            printf("%d\n", alloc[i] + 1);
+        else
+            printf("NA\n");
+    }
+}
+
+void worstFit(int bs[], int m, int ps[], int n) {
+    int alloc[MAX];
+    for (int i = 0; i < n; i++)
+        alloc[i] = -1;
+
+    for (int i = 0; i < n; i++) {
+        int worst = -1;
+        for (int j = 0; j < m; j++) {
+            if (bs[j] >= ps[i]) {
+                if (worst == -1 || bs[j] > bs[worst])
+                    worst = j;
+            }
+        }
+        if (worst != -1) {
+            alloc[i] = worst;
+            bs[worst] -= ps[i];
+        }
+    }
+
+    printf("\nWorst-Fit:\n");
+    printf("P.No\tP.Size\tBlock\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d\t%d\t", i + 1, ps[i]);
+        if (alloc[i] != -1)
+            printf("%d\n", alloc[i] + 1);
+        else
+            printf("NA\n");
+    }
+}
+
+int main() {
+    int bs[MAX], ps[MAX], m, n;
+
+    printf("Enter no. of blocks: ");
+    scanf("%d", &m);
+    printf("Enter block sizes:\n");
+    for (int i = 0; i < m; i++) {
+        printf("B%d: ", i + 1);
+        scanf("%d", &bs[i]);
+    }
+
+    printf("Enter no. of processes: ");
+    scanf("%d", &n);
+    printf("Enter process sizes:\n");
+    for (int i = 0; i < n; i++) {
+        printf("P%d: ", i + 1);
+        scanf("%d", &ps[i]);
+    }
+
+    int bs1[MAX], bs2[MAX], bs3[MAX];
+    for (int i = 0; i < m; i++) {
+        bs1[i] = bs[i];
+        bs2[i] = bs[i];
+        bs3[i] = bs[i];
+    }
+
+    firstFit(bs1, m, ps, n);
+    bestFit(bs2, m, ps, n);
+    worstFit(bs3, m, ps, n);
+
+    return 0;
+}
